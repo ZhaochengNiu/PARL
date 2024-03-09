@@ -49,13 +49,16 @@ def init_devices():
         devices.append(device)
     return devices
 
+
 def init_device_queues(n_device):
     for device in n_device:
         device.queue = 0
 
+
 def init_edge_queues(n_edge):
     for edge in n_edge:
         edge.queue = 0
+
 
 def get_uav_upload_rate(device, edge):
     x1 = device.x
@@ -72,6 +75,7 @@ def get_uav_upload_rate(device, edge):
     rate = bandwidth * (math.log(1 + snr, 2))
     return rate
 
+
 def get_the_channel_gain(device, edge):
     x1 = device.x
     y1 = device.y
@@ -83,6 +87,7 @@ def get_the_channel_gain(device, edge):
     channel_gain = gain /distance2
     return channel_gain
 
+
 def get_the_distance(device, edge):
     x1 = device.x
     y1 = device.y
@@ -90,6 +95,7 @@ def get_the_distance(device, edge):
     y2 = edge.y
     distance = math.sqrt(math.pow((x2-x1),2) + math.pow((y2-y1), 2))
     return distance
+
 
 def update_system(n_device, n_edge):
     global uav_trans_rates
@@ -114,6 +120,7 @@ def init_trans_states(n_device, n_edge):
                 upload_rate = get_uav_upload_rate(n_device[i], n_edge[j])
                 uav_trans_rates[i][j] = upload_rate
 
+
 def init_edges():
     global edges
     for i in range(0, config.total_number_of_edges):
@@ -124,11 +131,12 @@ def init_edges():
         edges.append(edge)
     return edges
 
+
 def init_tasks():
     tasks= []
     for i in range(0, config.total_number_of_devices):
         data_size = np.random.uniform(config.task_size[0], config.task_size[1])
-        cpu_frequency_demand = config.task_cpu_frequency_demand
+        cpu_frequency_demand = config.task_cpu_frequency_demand * data_size
         task = Task(data_size, cpu_frequency_demand)
         tasks.append(task)
     return tasks
@@ -227,7 +235,7 @@ class DispersedNetworkEnv(gym.Env):
         # 计算状态的reward
 
         self.count += 1
-        done = self.count > 99
+        done = self.count > 999
 
         for i in range(0, config.total_number_of_devices):
             done_n.append(done)
