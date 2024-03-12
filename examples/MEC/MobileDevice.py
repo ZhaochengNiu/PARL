@@ -4,13 +4,11 @@ import math
 
 class MobileDevice:
 
-    def __init__(self, nid, init_energy, max_energy_queue_length, frequency, ncp_type, move_distance, total_number_of_edges,
+    def __init__(self, nid, frequency, ncp_type, move_distance, total_number_of_edges,
                  min_x_location, max_x_location, min_y_location, max_y_location, generating_tasks_probability_of_device) -> None:
         super().__init__()
         self.id = nid       # 序号
         self.task_queue = 0
-        self.energy_queue = init_energy
-        self.MAX_ENERGY_QUEUE_LENGTH = max_energy_queue_length   # 队列最大长度
         self.frequency = frequency          # 当前计算能力
         self.ncp_type = ncp_type   # 节点类型
         # dBm 是功率单位，和 w 的换算如下：

@@ -26,9 +26,7 @@ from parl.utils import logger, summary
 from gym import spaces
 
 
-from env import DispersedNetworkEnv
-
-
+from env import MobileEdgeComputingEnv
 
 CRITIC_LR = 0.01  # learning rate for the critic model
 ACTOR_LR = 0.01  # learning rate of the actor model
@@ -104,7 +102,7 @@ def main():
     logger.set_dir('./train_log/{}_{}'.format(args.env,
                                               args.continuous_actions))
     # env = MAenv(args.env, args.continuous_actions)
-    env = DispersedNetworkEnv()
+    env = MobileEdgeComputingEnv()
     print(env.total_number_of_edges)
     if args.continuous_actions:
         assert isinstance(env.action_space[0], spaces.Box)
