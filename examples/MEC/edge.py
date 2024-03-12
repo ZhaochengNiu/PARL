@@ -1,29 +1,50 @@
 class Edge:
 
-    def __init__(self, nid, frequency, ncp_type, x, y) -> None:
+    def __init__(self, nid, frequency, ncp_type, x, y, total_number_of_devices) -> None:
         super().__init__()
-        self.queue = 0
-        self.id = nid   # 序号
-        self.frequency = frequency   # 当前计算能力
-        self.origin_frequency = frequency # 总计算能力
-        self.ncp_type = ncp_type # 节点类型
-        self.cal_power_cost = 1 * (10 ** -5) # 计算成本
-        self.d2d_trans_power = 0.04  # 计算成本
-        self.trans_cost_cpu_frequency = 0  # 传输功率
+        self.task_queue = 0
+        self.id = nid       # 序号
+        self.frequency = frequency          # 当前计算能力
+        self.task_queue = 0
+        # 传输功率 100W
+        self.trans_power = 50
+        self.ncp_type = ncp_type   # 节点类型
         self.x = x  # x 坐标
         self.y = y  # y 坐标
 
-    def push(self, size):
-        self.queue = self.queue + size
+    def task_enqueue(self, cpu_frequency_demand):
+        self.task_queue += cpu_frequency_demand
 
-    def poll(self, size):
-        if size < self.queue:
-            self.queue = self.queue -size
+    def task_dequeue(self, cpu_frequency_demand):
+        if self.task_queue >= cpu_frequency_demand:
+            self.task_queue -= cpu_frequency_demand
         else:
-            size = self.queue
-            self.queue = 0
-        return size
+            self.task_queue = 0
 
-    def queue_length(self):
-        return self.queue
+    def task_queue_length(self):
+        return self.task_queue
 
+
+if __name__ == '__main__':
+    # queue = []
+    # for i in range(0, 10):
+    #     queue.insert(0, i)
+    # print(queue)
+    # print(len(queue))
+    # for i in range(0, 3):
+    #     queue.pop()
+    # print(queue)
+    # print(len(queue))
+    # for i in range(0, 50):
+    #     destination = random.randint(-1, config.total_number_of_edges)
+    #     print(destination)
+    # test = []
+    # for i in range(0, 10):
+    #     test.append(i)
+    # print(test)
+    # coverage_mobile_device = [0 for i in range(0, 10)]
+    # print(coverage_mobile_device)
+    # for i in range(0, 10):
+    #     print(i)
+    task_queue = []
+    print(len(queue))
