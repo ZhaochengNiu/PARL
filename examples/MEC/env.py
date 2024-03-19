@@ -281,7 +281,12 @@ class MobileEdgeComputingEnv(gym.Env):
             error_cost = 1 - task.accuracy
             # 总效用
             total_cost = config.latency_weight * latency_cost + config.energy_weight * energy_cost + config.error_weight * error_cost
+            # 奖励设为消耗的负值
             reward = - total_cost
+            # 奖励设为消耗分之一
+            # reward = 1/total_cost
+            # 奖励设为反切值
+            # reward = math.atan(latency_cost) + math.atan(energy_cost) + math.atan(error_cost)
             reward_n.append(reward)
         for i in range(0, self.total_number_of_devices):
             state = np.zeros(self.state_dim, dtype=np.float32)
@@ -300,7 +305,12 @@ class MobileEdgeComputingEnv(gym.Env):
         for i in range(0, config.total_number_of_devices):
             done_n.append(done)
         update_system(devices_vector=self.devices, edges_vector=self.edges)
-
+        # 归一化
+        max_reward = max(reward_n)
+        min_reward = min(reward_n)
+        for i in range(0, len(reward_n)):
+            reward_n[i] = reward_n[i] - min_reward
+            reward_n[i] = reward_n[i] / (max_reward - min_reward)
         return self.state_n, reward_n, done_n, {}
 
     def reset(self):
