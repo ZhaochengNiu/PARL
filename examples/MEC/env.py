@@ -22,30 +22,15 @@ edges = []
 def init_devices():
     global devices
 
-    for i in range(0, config.total_number_of_active_devices):
+    for i in range(0, config.total_number_of_devices):
         frequency = config.activate_device_cpu_frequency
-        ncp_type = 'ACT DEV'
+        ncp_type = 'DEV'
         nid = i
         device = MobileDevice(nid=nid, frequency=frequency,
                               ncp_type=ncp_type, move_distance=config.MOVE_DISTANCE,
                               total_number_of_edges=config.total_number_of_edges,
                               min_x_location=config.MIN_X_LOCATION, max_x_location=config.MAX_X_LOCATION,
-                              min_y_location=config.MIN_Y_LOCATION, max_y_location=config.MAX_Y_LOCATION,
-                              generating_tasks_probability_of_device=config.generating_tasks_probability_of_active_device)
-        device.init_position()
-        device.get_the_distance(total_number_of_edges=config.total_number_of_edges, edges=edges)
-        devices.append(device)
-
-    for i in range(config.total_number_of_active_devices, config.total_number_of_devices):
-        frequency = config.passive_device_cpu_frequency
-        ncp_type = 'PAS DEV'
-        nid = i
-        device = MobileDevice(nid=nid, frequency=frequency,
-                              ncp_type=ncp_type, move_distance=config.MOVE_DISTANCE,
-                              total_number_of_edges=config.total_number_of_edges,
-                              min_x_location=config.MIN_X_LOCATION, max_x_location=config.MAX_X_LOCATION,
-                              min_y_location=config.MIN_Y_LOCATION, max_y_location=config.MAX_Y_LOCATION,
-                              generating_tasks_probability_of_device=config.generating_tasks_probability_of_active_device)
+                              min_y_location=config.MIN_Y_LOCATION, max_y_location=config.MAX_Y_LOCATION)
         device.init_position()
         device.get_the_distance(total_number_of_edges=config.total_number_of_edges, edges=edges)
         devices.append(device)
@@ -139,6 +124,7 @@ class MobileEdgeComputingEnv(gym.Env):
         self.state_n = None
         # Box(low=-1.0, high=2.0, shape=(3, 4), dtype=np.float32)
         self.observation_space = [gym.spaces.Box(-math.inf, math.inf, shape=(self.total_number_of_edges*2 + 1,1)) for _ in range(0, self.total_number_of_devices)]
+
         self.obs_shape_n = [self.state_dim for _ in range(0, self.total_number_of_devices)]
 
         self.env_name = 'multi_agent_mec'
@@ -259,6 +245,7 @@ class MobileEdgeComputingEnv(gym.Env):
                 local_computing_energy_cost = 0
             # 能量消耗
             energy_cost = local_computing_energy_cost + trans_energy_cost
+            print('energy_cost', energy_cost)
              # print('energy_cost', energy_cost)
             # 边缘计算执行时间
             if offload_computing_portion > 0:
@@ -276,9 +263,11 @@ class MobileEdgeComputingEnv(gym.Env):
             # print('local_execute_latency', local_execute_latency)
             # print('edge_execute_latency', edge_execute_latency)
             latency_cost = max(local_execute_latency, edge_execute_latency)
+            print('latency_cost', latency_cost)
             # print('latency_utility', latency_utility)
             # 精度消耗
             error_cost = 1 - task.accuracy
+            print('error_cost', error_cost)
             # 总效用
             total_cost = config.latency_weight * latency_cost + config.energy_weight * energy_cost + config.error_weight * error_cost
             # 奖励设为消耗的负值
@@ -286,7 +275,7 @@ class MobileEdgeComputingEnv(gym.Env):
             # 奖励设为消耗分之一
             # reward = 1/total_cost
             # 奖励设为反切值
-            # reward = math.atan(latency_cost) + math.atan(energy_cost) + math.atan(error_cost)
+            # reward = -(math.atan(latency_cost) + math.atan(energy_cost) + math.atan(error_cost))
             reward_n.append(reward)
         for i in range(0, self.total_number_of_devices):
             state = np.zeros(self.state_dim, dtype=np.float32)
@@ -305,12 +294,12 @@ class MobileEdgeComputingEnv(gym.Env):
         for i in range(0, config.total_number_of_devices):
             done_n.append(done)
         update_system(devices_vector=self.devices, edges_vector=self.edges)
-        # 归一化
-        max_reward = max(reward_n)
-        min_reward = min(reward_n)
-        for i in range(0, len(reward_n)):
-            reward_n[i] = reward_n[i] - min_reward
-            reward_n[i] = reward_n[i] / (max_reward - min_reward)
+        # # 归一化
+        # max_reward = max(reward_n)
+        # min_reward = min(reward_n)
+        # for i in range(0, len(reward_n)):
+        #     reward_n[i] = reward_n[i] - min_reward
+        #     reward_n[i] = reward_n[i] / (max_reward - min_reward)
         return self.state_n, reward_n, done_n, {}
 
     def reset(self):

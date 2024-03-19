@@ -47,6 +47,8 @@ class ActorModel(parl.Model):
         self.continuous_actions = continuous_actions
         hid1_size = 64
         hid2_size = 64
+        # 添加归一化层
+        self.norm_in = nn.LayerNorm(obs_dim)
         self.fc1 = nn.Linear(
             obs_dim,
             hid1_size,
@@ -62,6 +64,7 @@ class ActorModel(parl.Model):
             act_dim,
             weight_attr=paddle.ParamAttr(
                 initializer=paddle.nn.initializer.XavierUniform()))
+        self.norm_out = nn.LayerNorm(act_dim)
         if self.continuous_actions:
             std_hid_size = 64
             self.std_fc = nn.Linear(
@@ -71,9 +74,12 @@ class ActorModel(parl.Model):
                     initializer=paddle.nn.initializer.XavierUniform()))
 
     def forward(self, obs):
+        # 添加归一化层
+        obs = self.norm_in(obs)
         hid1 = F.relu(self.fc1(obs))
         hid2 = F.relu(self.fc2(hid1))
         means = self.fc3(hid2)
+        means = self.norm_out(means)
         if self.continuous_actions:
             act_std = self.std_fc(hid2)
             return (means, act_std)
@@ -86,6 +92,8 @@ class CriticModel(parl.Model):
         hid1_size = 64
         hid2_size = 64
         out_dim = 1
+        # 添加归一化层
+        self.norm = nn.LayerNorm(critic_in_dim)
         self.fc1 = nn.Linear(
             critic_in_dim,
             hid1_size,
@@ -104,6 +112,8 @@ class CriticModel(parl.Model):
 
     def forward(self, obs_n, act_n):
         inputs = paddle.concat(obs_n + act_n, axis=1)
+        # 添加归一化层
+        inputs = self.norm(inputs)
         hid1 = F.relu(self.fc1(inputs))
         hid2 = F.relu(self.fc2(hid1))
         Q = self.fc3(hid2)

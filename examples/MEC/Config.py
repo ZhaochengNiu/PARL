@@ -12,18 +12,10 @@ class Config:
         # 设备总数量
         self.total_number_of_devices = 10
 
-        self.total_number_of_active_devices = 6
-
-        self.total_number_of_passive_devices = 4
-
         self.total_number_of_resolutions = 6
 
         # 迭代次数
         self.times = 1000
-
-        self.generating_tasks_probability_of_active_device = 1
-
-        self.generating_tasks_probability_of_passive_device = 1
 
         # 时隙长度 100ms
         self.time_slot_length = 0.1

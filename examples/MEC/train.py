@@ -214,3 +214,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main()
+# tensorboard --logdir=/Users/niuzhaocheng/Documents/code/PARL/examples/MEC/train_log
