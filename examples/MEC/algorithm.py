@@ -9,8 +9,10 @@ from simple_agent import MAAgent
 from parl.algorithms import MADDPG
 import os
 
-CRITIC_LR = 0.0001  # learning rate for the critic model
-ACTOR_LR = 0.00001  # learning rate of the actor model
+# CRITIC_LR = 0.0001  # learning rate for the critic model
+# ACTOR_LR = 0.00001  # learning rate of the actor model
+CRITIC_LR = 0.001  # learning rate for the critic model
+ACTOR_LR = 0.0001  # learning rate of the actor model
 GAMMA = 0.95  # reward discount factor
 TAU = 0.01  # soft update
 BATCH_SIZE = 1024
