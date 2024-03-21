@@ -5,7 +5,7 @@ import math
 class MobileDevice:
 
     def __init__(self, nid, frequency, ncp_type, move_distance, total_number_of_edges,
-                 min_x_location, max_x_location, min_y_location, max_y_location, generating_tasks_probability_of_device) -> None:
+                 min_x_location, max_x_location, min_y_location, max_y_location) -> None:
         super().__init__()
         self.id = nid       # 序号
         self.task_queue = 0
@@ -19,7 +19,6 @@ class MobileDevice:
         self.x = 0  # x 坐标
         self.y = 0  # y 坐标
         self.distance_BS = [0 for i in range(total_number_of_edges)]
-        self.generating_tasks_probability_of_device = generating_tasks_probability_of_device
         self.MIN_X_LOCATION = min_x_location
         self.MAX_X_LOCATION = max_x_location
         self.MIN_Y_LOCATION = min_y_location

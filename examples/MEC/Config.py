@@ -23,12 +23,10 @@ class Config:
         self.bits_per_pixel = 24
 
         # 1 GHZ  cycles/s = 1
-        self.activate_device_cpu_frequency = 3 * (10 ** 9)
-
-        self.passive_device_cpu_frequency = 5 * (10 ** 9)
+        self.device_cpu_frequency = 3 * (10 ** 9)
 
         # 边缘服务器的算力
-        self.edge_cpu_frequency = 10 * (10 ** 9)
+        self.edge_cpu_frequency = 8 * (10 ** 9)
 
         self.SWITCHED_CAPACITANCE = 10 ** -28
 
@@ -38,13 +36,8 @@ class Config:
         # -100 dBm = 10 ** -13 W
         self.GAUSSIAN_WHITE_NOISE_POWER = 10 ** -13
 
-        # 30MHZ
-        self.OFFLOAD_BANDWIDTH = 30000000
-
-        # 1MHZ
-        self.D2D_BANDWIDTH = 2000000
-
-        self.D2D_CHANNEL_GAIN = 1
+        # 10MHZ
+        self.OFFLOAD_BANDWIDTH = 10000000
 
         # self.EDGE_CHANNEL_GAIN = 10 ** -4
 
@@ -67,22 +60,22 @@ class Config:
         self.edge_locations = [[125, 125], [125, 375], [375, 125], [375, 375]]
 
         # 延迟权重
-        self.latency_weight = 1
+        self.latency_weight = 1/3
 
         # 能量权重
-        self.energy_weight = 1
+        self.energy_weight = 1/3
 
         # 精度权重
-        self.error_weight = 1
+        self.error_weight = 1/3
 
         # sca 参数设置
         self.pop_size = 60
         self.a = 2 # 感知概率
-        self.max_iter = 500  # max iter
+        self.max_iter = 30  # max iter
 
         # self.algorithm = 'local_algorithm'
-        self.algorithm = 'nearest_algorithm'
-        # self.algorithm = 'random_algorithm'
+        # self.algorithm = 'nearest_algorithm'
+        self.algorithm = 'random_algorithm'
         # self.algorithm = 'proposed_algorithm'
         # 'local_algorithm'  'nearest_algorithm' 'random_algorithm' 'proposed_algorithm'
 

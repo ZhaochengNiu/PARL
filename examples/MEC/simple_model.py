@@ -64,6 +64,7 @@ class ActorModel(parl.Model):
             act_dim,
             weight_attr=paddle.ParamAttr(
                 initializer=paddle.nn.initializer.XavierUniform()))
+        # 输出归一化层
         self.norm_out = nn.LayerNorm(act_dim)
         if self.continuous_actions:
             std_hid_size = 64
@@ -86,11 +87,14 @@ class ActorModel(parl.Model):
         return means
 
 
+
 class CriticModel(parl.Model):
     def __init__(self, critic_in_dim):
         super(CriticModel, self).__init__()
-        hid1_size = 64
-        hid2_size = 64
+        # hid1_size = 64
+        # hid2_size = 64
+        hid1_size = 128
+        hid2_size = 128
         out_dim = 1
         # 添加归一化层
         self.norm = nn.LayerNorm(critic_in_dim)
