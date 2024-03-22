@@ -27,7 +27,7 @@ from gym import spaces
 
 
 from env import MobileEdgeComputingEnv
-# 0.0001
+
 # CRITIC_LR = 0.0001  # learning rate for the critic model
 # ACTOR_LR = 0.00001  # learning rate of the actor model
 CRITIC_LR = 0.001  # learning rate for the critic model
@@ -35,8 +35,8 @@ ACTOR_LR = 0.0001  # learning rate of the actor model
 GAMMA = 0.95  # reward discount factor
 TAU = 0.01  # soft update
 BATCH_SIZE = 1024
-# MAX_STEP_PER_EPISODE = 25  # maximum step per episode
-MAX_STEP_PER_EPISODE = 1000  # maximum step per episode
+MAX_STEP_PER_EPISODE = 25  # maximum step per episode
+# MAX_STEP_PER_EPISODE = 1000  # maximum step per episode
 EVAL_EPISODES = 3
 
 
@@ -102,7 +102,7 @@ def run_episode(env, agents):
 
 
 def main():
-    logger.set_dir('./train_log/{}_{}'.format(args.env,
+    logger.set_dir('./train_log_10/{}_{}'.format(args.env,
                                               args.continuous_actions))
     # env = MAenv(args.env, args.continuous_actions)
     env = MobileEdgeComputingEnv()
@@ -197,7 +197,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--model_dir',
         type=str,
-        default='./model',
+        default='./model_10',
         help='directory for saving model')
     parser.add_argument(
         '--continuous_actions',
@@ -212,7 +212,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--test_every_episodes',
         type=int,
-        default=int(1e3),
+        default=int(1000),
         help='the episode interval between two consecutive evaluations')
     args = parser.parse_args()
 

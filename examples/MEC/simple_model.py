@@ -90,10 +90,10 @@ class ActorModel(parl.Model):
 class CriticModel(parl.Model):
     def __init__(self, critic_in_dim):
         super(CriticModel, self).__init__()
-        # hid1_size = 64
-        # hid2_size = 64
-        hid1_size = 128
-        hid2_size = 128
+        hid1_size = 64
+        hid2_size = 64
+        # hid1_size = 128
+        # hid2_size = 128
         out_dim = 1
         # 添加归一化层
         # self.norm = nn.LayerNorm(critic_in_dim)

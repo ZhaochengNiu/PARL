@@ -23,7 +23,7 @@ EVAL_EPISODES = 3
 
 def local_algorithm(decisions, config):
     for j in range(0, config.total_number_of_devices):
-        decisions.resolution_selection.append(6)
+        decisions.resolution_selection.append(5)
         decisions.execute_destination.append(-1)
         decisions.local_computing_portion.append(1)
     return decisions
@@ -39,7 +39,7 @@ def nearest_bs_algorithm(decisions, config, devices, edges):
             if distance < min_distance:
                 min_distance = distance
                 destination = k
-        decisions.resolution_selection.append(6)
+        decisions.resolution_selection.append(5)
         decisions.execute_destination.append(destination)
     for j in range(0, config.total_number_of_devices):
         resolution = 600
@@ -65,41 +65,41 @@ def nearest_bs_algorithm(decisions, config, devices, edges):
 
 def random_algorithm(decisions, config, devices, edges):
     for j in range(0, config.total_number_of_devices):
-        rand_resolution = np.random.randint(1, 7)
-        if rand_resolution == 1:
+        rand_resolution = np.random.randint(0, config.total_number_of_resolutions)
+        if rand_resolution == 0:
             resolution = 100
+            data_size = config.bits_per_pixel * math.pow(resolution, 2)
+            decisions.resolution_selection.append(0)
+            rand_destination = np.random.randint(-1, config.total_number_of_edges)
+            decisions.execute_destination.append(rand_destination)
+        elif rand_resolution == 1:
+            resolution = 200
             data_size = config.bits_per_pixel * math.pow(resolution, 2)
             decisions.resolution_selection.append(1)
             rand_destination = np.random.randint(-1, config.total_number_of_edges)
             decisions.execute_destination.append(rand_destination)
         elif rand_resolution == 2:
-            resolution = 200
+            resolution = 300
             data_size = config.bits_per_pixel * math.pow(resolution, 2)
             decisions.resolution_selection.append(2)
             rand_destination = np.random.randint(-1, config.total_number_of_edges)
             decisions.execute_destination.append(rand_destination)
         elif rand_resolution == 3:
-            resolution = 300
+            resolution = 400
             data_size = config.bits_per_pixel * math.pow(resolution, 2)
             decisions.resolution_selection.append(3)
             rand_destination = np.random.randint(-1, config.total_number_of_edges)
             decisions.execute_destination.append(rand_destination)
         elif rand_resolution == 4:
-            resolution = 400
+            resolution = 500
             data_size = config.bits_per_pixel * math.pow(resolution, 2)
             decisions.resolution_selection.append(4)
             rand_destination = np.random.randint(-1, config.total_number_of_edges)
             decisions.execute_destination.append(rand_destination)
         elif rand_resolution == 5:
-            resolution = 500
-            data_size = config.bits_per_pixel * math.pow(resolution, 2)
-            decisions.resolution_selection.append(5)
-            rand_destination = np.random.randint(-1, config.total_number_of_edges)
-            decisions.execute_destination.append(rand_destination)
-        elif rand_resolution == 6:
             resolution = 600
             data_size = config.bits_per_pixel * math.pow(resolution, 2)
-            decisions.resolution_selection.append(6)
+            decisions.resolution_selection.append(5)
             rand_destination = np.random.randint(-1, config.total_number_of_edges)
             decisions.execute_destination.append(rand_destination)
         else:
@@ -132,23 +132,23 @@ def binary_match_game(decisions, config, devices, edges):
         resolution_selection = -1
         execute_destination = -2
         # 遍历所有可能的分辨率
-        for k in range(1, config.total_number_of_resolutions + 1):
-            if k == 1:
+        for k in range(0, config.total_number_of_resolutions):
+            if k == 0:
                 resolution = 100
                 accuracy = 0.176
-            elif k == 2:
+            elif k == 1:
                 resolution = 200
                 accuracy = 0.570
-            elif k == 3:
+            elif k == 2:
                 resolution = 300
                 accuracy = 0.775
-            elif k == 4:
+            elif k == 3:
                 resolution = 400
                 accuracy = 0.882
-            elif k == 5:
+            elif k == 4:
                 resolution = 500
                 accuracy = 0.939
-            elif k == 6:
+            elif k == 5:
                 resolution = 600
                 accuracy = 0.968
             else:
@@ -168,7 +168,8 @@ def binary_match_game(decisions, config, devices, edges):
             # 精度消耗
             error_cost = 1 - accuracy
             # 总效用
-            total_local_cost = config.latency_weight * local_latency_cost + config.energy_weight * local_energy_cost + config.error_weight * error_cost
+            # total_local_cost = config.latency_weight * local_latency_cost + config.energy_weight * local_energy_cost + config.error_weight * error_cost
+            total_local_cost = config.latency_weight * math.atan(local_latency_cost) + config.energy_weight * math.atan(local_energy_cost) + config.error_weight * math.atan(error_cost)
             # 更新 flag
             if total_local_cost <= cost_flag:
                 cost_flag = total_local_cost
@@ -198,7 +199,8 @@ def binary_match_game(decisions, config, devices, edges):
                 # 精度消耗
                 error_cost = 1 - accuracy
                 # 总效用
-                total_edge_cost = config.latency_weight * edge_latency_cost + config.energy_weight * edge_energy_cost + config.error_weight * error_cost
+                # total_edge_cost = config.latency_weight * edge_latency_cost + config.energy_weight * edge_energy_cost + config.error_weight * error_cost
+                total_edge_cost = config.latency_weight * math.atan(edge_latency_cost) + config.energy_weight * math.atan(edge_energy_cost) + config.error_weight * math.atan(error_cost)
                 # 更新 flag
                 if total_edge_cost <= cost_flag:
                     cost_flag = total_edge_cost
@@ -248,7 +250,92 @@ def binary_match_game(decisions, config, devices, edges):
     return decisions
 
 
-def proposed_algorithm(decisions, config, devices, edges, time_slot, task_in_each_slot):
+def proposed_algorithm(decisions, config, devices, edges):
+    # build agents
+    agents = []
+    for i in range(config.total_number_of_devices):
+        critic_in_dim = sum(config.obs_shape_n) + sum(config.act_shape_n)
+        model = MAModel(config.obs_shape_n[i], config.act_shape_n[i], critic_in_dim)
+        algorithm = MADDPG(
+            model,
+            agent_index=i,
+            act_space=config.action_space,
+            gamma=GAMMA,
+            tau=TAU,
+            critic_lr=CRITIC_LR,
+            actor_lr=ACTOR_LR)
+        agent = MAAgent(
+            algorithm,
+            agent_index=i,
+            obs_dim_n=config.obs_shape_n,
+            act_dim_n=config.act_shape_n,
+            batch_size=BATCH_SIZE)
+        agents.append(agent)
+    for i in range(len(agents)):
+        model_file = config.model_dir + '/agent_' + str(i)
+        if not os.path.exists(model_file):
+            raise Exception(
+                'model file {} does not exits'.format(model_file))
+        agents[i].restore(model_file)
+    state_n = []
+    for i in range(0, config.total_number_of_devices):
+        state = np.zeros(config.state_dim, dtype=np.float32)
+        for j in range(0, config.total_number_of_edges):
+            state[j * 2] = edges[j].task_queue_length()/edges[j].frequency
+            channel_gain = get_upload_gain(devices[i], edges[j])
+            state[j * 2 + 1] = channel_gain
+        state[config.total_number_of_edges * 2] = devices[i].task_queue_length()/devices[i].frequency
+        # 状态复位
+        state_n.append(state)
+    action_n = [agent.predict(state) for agent, state in zip(agents, state_n)]
+    for i in range(0, config.total_number_of_devices):
+        resolution_selection = action_n[i].argmax() // config.total_number_of_edges
+        # print(resolution_selection)
+        execute_edge_id = action_n[i].argmax() % config.total_number_of_edges
+        # print(execute_edge_id)
+        execute_edge = edges[execute_edge_id]
+        decisions.resolution_selection.append(resolution_selection)
+        decisions.execute_destination.append(execute_edge_id)
+        if resolution_selection == 0:
+            resolution = 100
+            accuracy = 0.176
+        elif resolution_selection == 1:
+            resolution = 200
+            accuracy = 0.570
+        elif resolution_selection == 2:
+            resolution = 300
+            accuracy = 0.775
+        elif resolution_selection == 3:
+            resolution = 400
+            accuracy = 0.882
+        elif resolution_selection == 4:
+            resolution = 500
+            accuracy = 0.939
+        elif resolution_selection == 5:
+            resolution = 600
+            accuracy = 0.968
+        else:
+            print('error_resolution')
+        data_size = config.bits_per_pixel * math.pow(resolution, 2)
+        cpu_frequency_demand = data_size * config.task_cpu_frequency_demand
+        interference = 0
+        for j in range(0, config.total_number_of_devices):
+            execute_edge_id_temp = action_n[j].argmax() % config.total_number_of_edges
+            if j != i and execute_edge_id_temp == execute_edge_id:
+                gain = get_upload_gain(device=devices[j], edge=execute_edge)
+                interference += gain
+        upload_rate = get_upload_rate(device=devices[i], edge=execute_edge, interference=interference)
+        slot_upload_data_size = upload_rate * config.time_slot_length
+        slot_upload_data_size = round(slot_upload_data_size, 6)
+        offload_data_size_up_limit = min(slot_upload_data_size, data_size)
+        offload_computing_portion_up_limit = offload_data_size_up_limit / data_size
+        offload_computing_portion_up_limit = round(offload_computing_portion_up_limit, 6)
+        X = np.random.uniform(low=0, high=offload_computing_portion_up_limit)
+        local_computing_portion = 1 - X
+        decisions.local_computing_portion.append(local_computing_portion)
+    return decisions
+
+def proposed_algorithm_v2(decisions, config, devices, edges):
     # build agents
     agents = []
     for i in range(config.total_number_of_devices):

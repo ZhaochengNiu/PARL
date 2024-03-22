@@ -138,7 +138,7 @@ class MobileEdgeComputingEnv(gym.Env):
 
         self.count = 0
 
-    def step_v2(self, action_n):
+    def step(self, action_n):
         reward_n = []
         done_n = []
         self.state_n = []
@@ -149,7 +149,7 @@ class MobileEdgeComputingEnv(gym.Env):
             for i in range(0, self.total_number_of_edges):
                 edge_compute(edge=self.edges[i])
         for i in range(0, self.total_number_of_devices):
-            resolution_selection = action_n[i].argmax()//self.total_number_of_edges
+            resolution_selection = action_n[i].argmax() // self.total_number_of_edges
             # print(resolution_selection)
             execute_edge_id = action_n[i].argmax() % self.total_number_of_edges
             # print(execute_edge_id)
@@ -188,8 +188,8 @@ class MobileEdgeComputingEnv(gym.Env):
             offload_data_size_up_limit = min(slot_upload_data_size, data_size)
             offload_computing_portion_up_limit = offload_data_size_up_limit / data_size
             offload_computing_portion_up_limit = round(offload_computing_portion_up_limit, 6)
-            offload_computing_portion = offload_computing_portion_up_limit
-            # offload_computing_portion = np.random.uniform(low=0, high=offload_computing_portion_up_limit)
+            x = np.random.uniform(low=0, high=offload_computing_portion_up_limit)
+            offload_computing_portion = x
             local_computing_portion = 1 - offload_computing_portion
             if offload_computing_portion > 0:
                 offload_data_size = data_size * offload_computing_portion
@@ -265,7 +265,8 @@ class MobileEdgeComputingEnv(gym.Env):
             # print('error_cost', error_cost)
             # 总效用
             # total_cost = config.latency_weight * latency_cost + config.energy_weight * energy_cost + config.error_weight * error_cost
-            total_cost = config.latency_weight * math.atan(latency_cost) + config.energy_weight * math.atan(energy_cost) + config.error_weight * math.atan(error_cost)
+            total_cost = config.latency_weight * math.atan(latency_cost) + config.energy_weight * math.atan(
+                energy_cost) + config.error_weight * math.atan(error_cost)
             # total_cost = config.latency_weight * math.exp(-latency_cost) + config.energy_weight * math.exp(-energy_cost) + config.error_weight * math.exp(-error_cost)
             # 奖励设为消耗的负值
             reward = - total_cost
@@ -275,10 +276,27 @@ class MobileEdgeComputingEnv(gym.Env):
             reward_n.append(reward)
         for i in range(0, self.total_number_of_devices):
             state = np.zeros(self.state_dim, dtype=np.float32)
+            # queue_list = []
+            # channel_list = []
+            # for j in range(0, self.total_number_of_edges):
+            #     queue_list.append(self.edges[j].task_queue_length() / self.edges[j].frequency)
+            #     channel_list.append(get_upload_gain(self.devices[i], self.edges[j]))
+            # queue_list.append(self.devices[i].task_queue_length() / self.devices[i].frequency)
+            # queue_mean_value = np.mean(queue_list)
+            # queue_std_deviation = np.std(queue_list)
+            # channel_mean_value = np.mean(channel_list)
+            # channel_std_deviation = np.std(channel_list)
+            # normalized_queue_list = [(x - queue_mean_value) / queue_std_deviation for x in queue_list]
+            # normalized_channel_list = [(x - channel_mean_value) / channel_std_deviation for x in channel_list]
+            # for j in range(0, self.total_number_of_edges):
+            #     state[j * 2] = normalized_queue_list[j]
+            #     state[j * 2 + 1] = normalized_channel_list[j]
+            # state[self.total_number_of_edges * 2] = normalized_queue_list[self.total_number_of_edges]
+            # print('state',state)
             for j in range(0, self.total_number_of_edges):
-                state[j*2] = self.edges[j].task_queue_length()
+                state[j * 2] = self.edges[j].task_queue_length()/self.edges[j].frequency
                 channel_gain = get_upload_gain(self.devices[i], self.edges[j])
-                state[j*2+1] = channel_gain
+                state[j * 2 + 1] = channel_gain
             state[self.total_number_of_edges * 2] = self.devices[i].task_queue_length()
             # 状态复位
             self.state_n.append(state)
@@ -298,7 +316,187 @@ class MobileEdgeComputingEnv(gym.Env):
         #     reward_n[i] = reward_n[i] / (max_reward - min_reward)
         return self.state_n, reward_n, done_n, {}
 
-    def step(self, action_n):
+    # 归一化，第二阶段随机
+    def step_norm_random(self, action_n):
+        reward_n = []
+        done_n = []
+        self.state_n = []
+
+        if self.count > 0:
+            for i in range(0, self.total_number_of_devices):
+                device_compute(device=self.devices[i])
+            for i in range(0, self.total_number_of_edges):
+                edge_compute(edge=self.edges[i])
+        for i in range(0, self.total_number_of_devices):
+            resolution_selection = action_n[i].argmax() // self.total_number_of_edges
+            # print(resolution_selection)
+            execute_edge_id = action_n[i].argmax() % self.total_number_of_edges
+            # print(execute_edge_id)
+            execute_edge = self.edges[execute_edge_id]
+            if resolution_selection == 0:
+                resolution = 100
+                accuracy = 0.176
+            elif resolution_selection == 1:
+                resolution = 200
+                accuracy = 0.570
+            elif resolution_selection == 2:
+                resolution = 300
+                accuracy = 0.775
+            elif resolution_selection == 3:
+                resolution = 400
+                accuracy = 0.882
+            elif resolution_selection == 4:
+                resolution = 500
+                accuracy = 0.939
+            elif resolution_selection == 5:
+                resolution = 600
+                accuracy = 0.968
+            else:
+                print('error_resolution')
+            data_size = config.bits_per_pixel * math.pow(resolution, 2)
+            cpu_frequency_demand = data_size * config.task_cpu_frequency_demand
+            interference = 0
+            for j in range(0, config.total_number_of_devices):
+                execute_edge_id_temp = action_n[j].argmax() % self.total_number_of_edges
+                if j != i and execute_edge_id_temp == execute_edge_id:
+                    gain = get_upload_gain(device=self.devices[j], edge=execute_edge)
+                    interference += gain
+            upload_rate = get_upload_rate(device=self.devices[i], edge=execute_edge, interference=interference)
+            slot_upload_data_size = upload_rate * config.time_slot_length
+            slot_upload_data_size = round(slot_upload_data_size, 6)
+            offload_data_size_up_limit = min(slot_upload_data_size, data_size)
+            offload_computing_portion_up_limit = offload_data_size_up_limit / data_size
+            offload_computing_portion_up_limit = round(offload_computing_portion_up_limit, 6)
+            x = np.random.uniform(low=0, high=offload_computing_portion_up_limit)
+            offload_computing_portion = x
+            local_computing_portion = 1 - offload_computing_portion
+            if offload_computing_portion > 0:
+                offload_data_size = data_size * offload_computing_portion
+                # 计算传输速率
+                interference = 0
+                for j in range(0, config.total_number_of_devices):
+                    execute_edge_id_temp = action_n[j].argmax() % self.total_number_of_edges
+                    if j != i and execute_edge_id_temp == execute_edge_id:
+                        gain = get_upload_gain(device=self.devices[j], edge=execute_edge)
+                        interference += gain
+                upload_rate = get_upload_rate(device=self.devices[i], edge=execute_edge, interference=interference)
+                # print('upload_rate', upload_rate/8388608)
+                # 传输时间
+                edge_transmit_latency = offload_data_size / upload_rate
+                edge_transmit_latency = round(edge_transmit_latency, 6)
+                # print('edge_transmit_latency=', edge_transmit_latency)
+                if edge_transmit_latency >= config.time_slot_length:
+                    edge_transmit_latency = config.time_slot_length
+                # print('real_edge_transmit_latency=', edge_transmit_latency)
+                # 传输能耗
+                trans_energy_cost = edge_transmit_latency * self.devices[i].offload_trans_power
+            elif offload_computing_portion == 0:
+                # 传输时间
+                edge_transmit_latency = 0
+                # 传输能耗
+                trans_energy_cost = 0
+            else:
+                print('error_offload_computing_portion')
+            # 本地计算时间
+            if local_computing_portion > 0:
+                if edge_transmit_latency == config.time_slot_length:
+                    edge_transmit_data_size = upload_rate * config.time_slot_length
+                    local_computing_data_size = data_size - edge_transmit_data_size
+                    local_computing_cpu_demand = local_computing_data_size * config.task_cpu_frequency_demand
+                else:
+                    local_computing_cpu_demand = cpu_frequency_demand * local_computing_portion
+                self.devices[i].task_enqueue(cpu_frequency_demand=local_computing_cpu_demand)
+                # 队列长度
+                queue_length = self.devices[i].task_queue_length()
+                # 本地计算时间
+                local_execute_latency = queue_length / self.devices[i].frequency
+                # 本地计算能耗
+                local_computing_power = config.SWITCHED_CAPACITANCE * math.pow(self.devices[i].frequency, 3)
+                local_computing_latency = local_computing_cpu_demand / self.devices[i].frequency
+                local_computing_energy_cost = local_computing_latency * local_computing_power
+            elif local_computing_portion == 0:
+                local_computing_cpu_demand = 0
+                local_execute_latency = 0
+                local_computing_energy_cost = 0
+            else:
+                print('error_local_computing_portion')
+            # 能量消耗
+            energy_cost = local_computing_energy_cost + trans_energy_cost
+            # print('energy_cost', energy_cost)
+            # 边缘计算执行时间
+            if offload_computing_portion > 0:
+                offload_computing_cpu_demand = cpu_frequency_demand - local_computing_cpu_demand
+                execute_edge.task_enqueue(cpu_frequency_demand=offload_computing_cpu_demand)
+                edge_queue_length = execute_edge.task_queue_length()
+                edge_compute_task_latency = edge_queue_length / execute_edge.frequency
+            elif offload_computing_portion == 0:
+                edge_compute_task_latency = 0
+            else:
+                print('error_offload_computing_portion')
+            edge_execute_latency = edge_transmit_latency + edge_compute_task_latency
+            # 延迟效用
+            # print('local_execute_latency', local_execute_latency)
+            # print('edge_execute_latency', edge_execute_latency)
+            latency_cost = max(local_execute_latency, edge_execute_latency)
+            # print('latency_cost', latency_cost)
+            # 精度消耗
+            error_cost = 1 - accuracy
+            # print('error_cost', error_cost)
+            # 总效用
+            # total_cost = config.latency_weight * latency_cost + config.energy_weight * energy_cost + config.error_weight * error_cost
+            total_cost = config.latency_weight * math.atan(latency_cost) + config.energy_weight * math.atan(
+                energy_cost) + config.error_weight * math.atan(error_cost)
+            # total_cost = config.latency_weight * math.exp(-latency_cost) + config.energy_weight * math.exp(-energy_cost) + config.error_weight * math.exp(-error_cost)
+            # 奖励设为消耗的负值
+            reward = - total_cost
+            # 奖励设为消耗分之一
+            # reward = 1/total_cost
+            # 奖励设为反切值
+            reward_n.append(reward)
+        for i in range(0, self.total_number_of_devices):
+            state = np.zeros(self.state_dim, dtype=np.float32)
+            queue_list = []
+            channel_list = []
+            for j in range(0, self.total_number_of_edges):
+                queue_list.append(self.edges[j].task_queue_length() / self.edges[j].frequency)
+                channel_list.append(get_upload_gain(self.devices[i], self.edges[j]))
+            queue_list.append(self.devices[i].task_queue_length() / self.devices[i].frequency)
+            queue_mean_value = np.mean(queue_list)
+            queue_std_deviation = np.std(queue_list)
+            channel_mean_value = np.mean(channel_list)
+            channel_std_deviation = np.std(channel_list)
+            normalized_queue_list = [(x - queue_mean_value) / queue_std_deviation for x in queue_list]
+            normalized_channel_list = [(x - channel_mean_value) / channel_std_deviation for x in channel_list]
+            for j in range(0, self.total_number_of_edges):
+                state[j * 2] = normalized_queue_list[j]
+                state[j * 2 + 1] = normalized_channel_list[j]
+            state[self.total_number_of_edges * 2] = normalized_queue_list[self.total_number_of_edges]
+            # print('state',state)
+            # for j in range(0, self.total_number_of_edges):
+            #     state[j * 2] = self.edges[j].task_queue_length()/self.edges[j].frequency
+            #     channel_gain = get_upload_gain(self.devices[i], self.edges[j])
+            #     state[j * 2 + 1] = channel_gain
+            # state[self.total_number_of_edges * 2] = self.devices[i].task_queue_length()
+            # 状态复位
+            self.state_n.append(state)
+
+        # 计算状态的reward
+
+        self.count += 1
+        done = self.count > 999
+        for i in range(0, config.total_number_of_devices):
+            done_n.append(done)
+        update_system(devices_vector=self.devices, edges_vector=self.edges)
+        # # 归一化
+        # max_reward = max(reward_n)
+        # min_reward = min(reward_n)
+        # for i in range(0, len(reward_n)):
+        #     reward_n[i] = reward_n[i] - min_reward
+        #     reward_n[i] = reward_n[i] / (max_reward - min_reward)
+        return self.state_n, reward_n, done_n, {}
+
+    # 归一化，第二阶段SCA
+    def step_v2(self, action_n):
         reward_n = []
         done_n = []
         self.state_n = []
@@ -632,14 +830,24 @@ class MobileEdgeComputingEnv(gym.Env):
         init_device_queues(self.devices)
         init_edge_queues(self.edges)
         for i in range(0, self.total_number_of_devices):
-            state_empty = np.zeros(self.state_dim, dtype=np.float32)
+            state = np.zeros(self.state_dim, dtype=np.float32)
+            queue_list = []
+            channel_list = []
             for j in range(0, self.total_number_of_edges):
-                state_empty[j*2] = self.edges[j].task_queue_length()
-                channel_gain = get_upload_gain(self.devices[i], self.edges[j])
-                state_empty[j*2+1] = channel_gain
-            state_empty[self.total_number_of_edges * 2] = self.devices[i].task_queue_length()
-            # 状态复位
-            self.state_n.append(state_empty)
+                queue_list.append(self.edges[j].task_queue_length() / self.edges[j].frequency)
+                channel_list.append(get_upload_gain(self.devices[i], self.edges[j]))
+            queue_list.append(self.devices[i].task_queue_length() / self.devices[i].frequency)
+            queue_mean_value = np.mean(queue_list)
+            queue_std_deviation = np.std(queue_list)
+            channel_mean_value = np.mean(channel_list)
+            channel_std_deviation = np.std(channel_list)
+            normalized_queue_list = [(x - queue_mean_value) / queue_std_deviation for x in queue_list]
+            normalized_channel_list = [(x - channel_mean_value) / channel_std_deviation for x in channel_list]
+            for j in range(0, self.total_number_of_edges):
+                state[j * 2] = normalized_queue_list[j]
+                state[j * 2 + 1] = normalized_channel_list[j]
+            state[self.total_number_of_edges * 2] = normalized_queue_list[self.total_number_of_edges]
+            self.state_n.append(state)
         self.count = 0
         return self.state_n
 

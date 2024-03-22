@@ -5,15 +5,16 @@ Local = np.loadtxt('./result/LocalEnergyCostInEachSlotFilePath10.cache')
 Nearest = np.loadtxt('./result/NearestEnergyCostInEachSlotFilePath10.cache')
 Random = np.loadtxt('./result/RandomEnergyCostInEachSlotFilePath10.cache')
 Match = np.loadtxt('./result/MatchEnergyCostInEachSlotFilePath10.cache')
-
+Proposed = np.loadtxt('./result/ProposedEnergyCostInEachSlotFilePath10.cache')
 
 Local_energy = sum(Local)
 Nearest_energy = sum(Nearest)
 Random_energy = sum(Random)
 Match_energy = sum(Match)
+Proposed_energy = sum(Proposed)
 
-x_data = ['Local', 'Nearest', 'Random', 'Match']
-y_data = [Local_energy, Nearest_energy, Random_energy, Match_energy]
+x_data = ['Local', 'Nearest', 'Random', 'Match', 'proposed']
+y_data = [Local_energy, Nearest_energy, Random_energy, Match_energy, Proposed_energy]
 
 colors = ['#9999FF', '#58C9B9', '#CC33CC', '#D1B6E1', '#99FF99', '#FF6666']
 

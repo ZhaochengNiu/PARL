@@ -115,15 +115,14 @@ def make_decision(time_slot):
     elif config.algorithm == 'match_algorithm':
         decisions = binary_match_game(decisions=decisions, config=config, devices=devices, edges=edges)
     elif config.algorithm == 'proposed_algorithm':
-        decisions = proposed_algorithm(decisions=decisions, config=config, devices=devices, edges=edges,
-                                       time_slot=time_slot)
+        decisions = proposed_algorithm(decisions=decisions, config=config, devices=devices, edges=edges)
     else:
         pass
     if config.algorithm == 'proposed_algorithm':
         for i in range(0, config.total_number_of_devices):
-            if decisions.execute_mode[i] == 'local':
+            if decisions.execute_destination[i] == -1:
                 local_ratio_in_each_slot[time_slot] = local_ratio_in_each_slot[time_slot] + 1
-            elif decisions.execute_mode[i] == 'edge':
+            else:
                 edge_ratio_in_each_slot[time_slot] = edge_ratio_in_each_slot[time_slot] + 1
     return decisions
 
@@ -133,22 +132,22 @@ def execute_decision(device, edges, decisions):
     global io_in_each_slot
     resolution_selection = decisions.resolution_selection[device.id]
     print('resolution_selection',resolution_selection)
-    if resolution_selection == 1:
+    if resolution_selection == 0:
         resolution = 100
         accuracy = 0.176
-    elif resolution_selection == 2:
+    elif resolution_selection == 1:
         resolution = 200
         accuracy = 0.570
-    elif resolution_selection == 3:
+    elif resolution_selection == 2:
         resolution = 300
         accuracy = 0.775
-    elif resolution_selection == 4:
+    elif resolution_selection == 3:
         resolution = 400
         accuracy = 0.882
-    elif resolution_selection == 5:
+    elif resolution_selection == 4:
         resolution = 500
         accuracy = 0.939
-    elif resolution_selection == 6:
+    elif resolution_selection == 5:
         resolution = 600
         accuracy = 0.968
     else:
@@ -175,12 +174,14 @@ def execute_decision(device, edges, decisions):
         error_cost = 1 - task.accuracy
         print('error_cost', error_cost)
         # 总效用
-        total_cost = config.latency_weight * latency_cost + config.energy_weight * energy_cost + config.error_weight * error_cost
+        # total_cost = config.latency_weight * latency_cost + config.energy_weight * energy_cost + config.error_weight * error_cost
+        total_cost = config.latency_weight * math.atan(latency_cost) + config.energy_weight * math.atan(energy_cost) + config.error_weight * math.atan(error_cost)
 
     elif decisions.execute_destination[device.id] != -1:
         # print('edge')
         execute_edge_id = decisions.execute_destination[device.id]
         local_computing_portion = decisions.local_computing_portion[device.id]
+        print('local_computing_portion',local_computing_portion)
         execute_edge = edges[execute_edge_id]
         # 计算卸载数据大小
         offload_computing_portion = (1 - local_computing_portion)
@@ -257,7 +258,8 @@ def execute_decision(device, edges, decisions):
         # 精度消耗
         error_cost = 1 - task.accuracy
         # 总效用
-        total_cost = config.latency_weight * latency_cost + config.energy_weight * energy_cost + config.error_weight * error_cost
+        # total_cost = config.latency_weight * latency_cost + config.energy_weight * energy_cost + config.error_weight * error_cost
+        total_cost = config.latency_weight * math.atan(latency_cost) + config.energy_weight * math.atan(energy_cost) + config.error_weight * math.atan(error_cost)
     else:
         print('error')
     return latency_cost, energy_cost, error_cost, total_cost
@@ -335,7 +337,6 @@ def print_result():
     global total_cost_in_each_slot
     global local_ratio_in_each_slot
     global edge_ratio_in_each_slot
-    global d2d_ratio_in_each_slot
 
     # path = config.res_cache_path + str(config.local_algorithm)
     # file = open(path, 'w+')
@@ -352,7 +353,6 @@ def print_result():
         for i in range(0, config.times):
             local_ratio_in_each_slot[i] = local_ratio_in_each_slot[i] / config.total_number_of_devices
             edge_ratio_in_each_slot[i] = edge_ratio_in_each_slot[i] / config.total_number_of_devices
-            d2d_ratio_in_each_slot[i] = d2d_ratio_in_each_slot[i] / config.total_number_of_devices
 
         local_ratio_in_each_slot_file_path = config.local_ratio_in_each_slot_file_path
         file = open(local_ratio_in_each_slot_file_path, 'w+')

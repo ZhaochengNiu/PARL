@@ -16,9 +16,10 @@ Match_cost = sum(Match)
 Proposed_cost = sum(Proposed)
 
 # x_data = ['Local', 'Nearest', 'Random', 'Game']
-# y_data = [Local_cost, Nearest_cost, Random_cost, Game_cost]
+# # y_data = [Local_cost, Nearest_cost, Random_cost, Game_cost]
 x_data = ['Local', 'Nearest', 'Random', 'Match', 'Proposed']
 y_data = [Local_cost, Nearest_cost, Random_cost, Match_cost, Proposed_cost]
+
 
 colors = ['#9999FF', '#58C9B9', '#CC33CC', '#D1B6E1', '#99FF99', '#FF6666']
 
