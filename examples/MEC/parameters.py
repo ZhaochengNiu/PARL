@@ -31,7 +31,7 @@ class Config:
 
         self.obs_shape_n = [self.state_dim for _ in range(0, self.total_number_of_devices)]
 
-        self.model_dir ='./model10'
+        self.model_dir ='./model_10'
 
         # 迭代次数
         self.times = 1000
@@ -89,7 +89,7 @@ class Config:
         # sca 参数设置
         self.pop_size = 60
         self.a = 2 # 感知概率
-        self.max_iter = 1  # max iter
+        self.max_iter = 30  # max iter
 
         # self.algorithm = 'local_algorithm'
         # self.algorithm = 'nearest_algorithm'
@@ -152,7 +152,6 @@ class Config:
 
 ========================================================================================================================
 
-
 # 10个用户
 import gym
 import math
@@ -186,10 +185,10 @@ class Config:
 
         self.obs_shape_n = [self.state_dim for _ in range(0, self.total_number_of_devices)]
 
-        self.model_dir ='./model15'
+        self.model_dir ='./model_15'
 
         # 迭代次数
-        self.times = 1000
+        self.times = 25
 
         # 时隙长度 100ms
         self.time_slot_length = 0.1
@@ -244,18 +243,18 @@ class Config:
         # sca 参数设置
         self.pop_size = 60
         self.a = 2 # 感知概率
-        self.max_iter = 1  # max iter
+        self.max_iter = 30  # max iter
 
         # self.algorithm = 'local_algorithm'
         # self.algorithm = 'nearest_algorithm'
-        # self.algorithm = 'random_algorithm'
+        self.algorithm = 'random_algorithm'
         # self.algorithm = 'match_algorithm'
-        self.algorithm = 'proposed_algorithm'
+        # self.algorithm = 'proposed_algorithm'
         # 'local_algorithm'  'nearest_algorithm' 'random_algorithm' 'proposed_algorithm'
 
         # 缓存设置
-        # self.cache = True
-        self.cache = False
+        self.cache = True
+        # self.cache = False
         # True False
         self.devices_cache_file_path = './cache/Devices15.cache'
         self.edges_cache_file_path = './cache/Edges15.cache'

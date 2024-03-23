@@ -89,7 +89,7 @@ class Config:
         # sca 参数设置
         self.pop_size = 60
         self.a = 2 # 感知概率
-        self.max_iter = 10  # max iter
+        self.max_iter = 30  # max iter
 
         # self.algorithm = 'local_algorithm'
         # self.algorithm = 'nearest_algorithm'

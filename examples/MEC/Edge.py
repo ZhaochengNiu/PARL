@@ -6,8 +6,6 @@ class Edge:
         self.id = nid       # 序号
         self.frequency = frequency          # 当前计算能力
         self.task_queue = 0
-        # 传输功率 100W
-        self.trans_power = 50
         self.ncp_type = ncp_type   # 节点类型
         self.x = x  # x 坐标
         self.y = y  # y 坐标

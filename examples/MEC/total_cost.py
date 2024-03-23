@@ -14,7 +14,6 @@ Nearest_cost = sum(Nearest)
 Random_cost = sum(Random)
 Match_cost = sum(Match)
 Proposed_cost = sum(Proposed)
-
 # x_data = ['Local', 'Nearest', 'Random', 'Game']
 # # y_data = [Local_cost, Nearest_cost, Random_cost, Game_cost]
 x_data = ['Local', 'Nearest', 'Random', 'Match', 'Proposed']
