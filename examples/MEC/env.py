@@ -274,6 +274,13 @@ class MobileEdgeComputingEnv(gym.Env):
             # reward = 1/total_cost
             # 奖励设为反切值
             reward_n.append(reward)
+        # 计算状态的reward
+
+        self.count += 1
+        done = self.count > 999
+        for i in range(0, config.total_number_of_devices):
+            done_n.append(done)
+        update_system(devices_vector=self.devices, edges_vector=self.edges)
         for i in range(0, self.total_number_of_devices):
             state = np.zeros(self.state_dim, dtype=np.float32)
             # queue_list = []
@@ -294,20 +301,12 @@ class MobileEdgeComputingEnv(gym.Env):
             # state[self.total_number_of_edges * 2] = normalized_queue_list[self.total_number_of_edges]
             # print('state',state)
             for j in range(0, self.total_number_of_edges):
-                state[j * 2] = self.edges[j].task_queue_length()/self.edges[j].frequency
-                channel_gain = get_upload_gain(self.devices[i], self.edges[j])
-                state[j * 2 + 1] = channel_gain
+                state[j * 2] = self.edges[j].task_queue_length() / self.edges[j].frequency
+                distance = self.devices[i].distance_BS[j]/500
+                state[j * 2 + 1] = distance
             state[self.total_number_of_edges * 2] = self.devices[i].task_queue_length()
             # 状态复位
             self.state_n.append(state)
-
-        # 计算状态的reward
-
-        self.count += 1
-        done = self.count > 999
-        for i in range(0, config.total_number_of_devices):
-            done_n.append(done)
-        update_system(devices_vector=self.devices, edges_vector=self.edges)
         # # 归一化
         # max_reward = max(reward_n)
         # min_reward = min(reward_n)
@@ -831,22 +830,29 @@ class MobileEdgeComputingEnv(gym.Env):
         init_edge_queues(self.edges)
         for i in range(0, self.total_number_of_devices):
             state = np.zeros(self.state_dim, dtype=np.float32)
-            queue_list = []
-            channel_list = []
+            # queue_list = []
+            # channel_list = []
+            # for j in range(0, self.total_number_of_edges):
+            #     queue_list.append(self.edges[j].task_queue_length() / self.edges[j].frequency)
+            #     channel_list.append(get_upload_gain(self.devices[i], self.edges[j]))
+            # queue_list.append(self.devices[i].task_queue_length() / self.devices[i].frequency)
+            # queue_mean_value = np.mean(queue_list)
+            # queue_std_deviation = np.std(queue_list)
+            # channel_mean_value = np.mean(channel_list)
+            # channel_std_deviation = np.std(channel_list)
+            # normalized_queue_list = [(x - queue_mean_value) / queue_std_deviation for x in queue_list]
+            # normalized_channel_list = [(x - channel_mean_value) / channel_std_deviation for x in channel_list]
+            # for j in range(0, self.total_number_of_edges):
+            #     state[j * 2] = normalized_queue_list[j]
+            #     state[j * 2 + 1] = normalized_channel_list[j]
+            # state[self.total_number_of_edges * 2] = normalized_queue_list[self.total_number_of_edges]
+            # print('state',state)
             for j in range(0, self.total_number_of_edges):
-                queue_list.append(self.edges[j].task_queue_length() / self.edges[j].frequency)
-                channel_list.append(get_upload_gain(self.devices[i], self.edges[j]))
-            queue_list.append(self.devices[i].task_queue_length() / self.devices[i].frequency)
-            queue_mean_value = np.mean(queue_list)
-            queue_std_deviation = np.std(queue_list)
-            channel_mean_value = np.mean(channel_list)
-            channel_std_deviation = np.std(channel_list)
-            normalized_queue_list = [(x - queue_mean_value) / queue_std_deviation for x in queue_list]
-            normalized_channel_list = [(x - channel_mean_value) / channel_std_deviation for x in channel_list]
-            for j in range(0, self.total_number_of_edges):
-                state[j * 2] = normalized_queue_list[j]
-                state[j * 2 + 1] = normalized_channel_list[j]
-            state[self.total_number_of_edges * 2] = normalized_queue_list[self.total_number_of_edges]
+                state[j * 2] = self.edges[j].task_queue_length() / self.edges[j].frequency
+                distance = self.devices[i].distance_BS[j] / 500
+                state[j * 2 + 1] = distance
+            state[self.total_number_of_edges * 2] = self.devices[i].task_queue_length()
+            # 状态复位
             self.state_n.append(state)
         self.count = 0
         return self.state_n
