@@ -100,9 +100,9 @@ class Config:
 
         # self.algorithm = 'local_algorithm'
         # self.algorithm = 'nearest_algorithm'
-        self.algorithm = 'random_algorithm'
+        # self.algorithm = 'random_algorithm'
         # self.algorithm = 'match_algorithm'
-        # self.algorithm = 'proposed_algorithm'
+        self.algorithm = 'proposed_algorithm'
         # 'local_algorithm'  'nearest_algorithm' 'random_algorithm' 'proposed_algorithm'
 
         # 缓存设置

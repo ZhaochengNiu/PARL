@@ -281,9 +281,9 @@ def print_result():
     # to do
     # ave_queue_length_in_each_slot_path = config.local_ave_queue_length_in_each_slot_file_path
     # ave_queue_length_in_each_slot_path = config.nearest_ave_queue_length_in_each_slot_file_path
-    ave_queue_length_in_each_slot_path = config.random_ave_queue_length_in_each_slot_file_path
+    # ave_queue_length_in_each_slot_path = config.random_ave_queue_length_in_each_slot_file_path
     # ave_queue_length_in_each_slot_path = config.match_ave_queue_length_in_each_slot_file_path
-    # ave_queue_length_in_each_slot_path = config.proposed_ave_queue_length_in_each_slot_file_path
+    ave_queue_length_in_each_slot_path = config.proposed_ave_queue_length_in_each_slot_file_path
     file = open(ave_queue_length_in_each_slot_path, 'w+')
     for item in ave_queue_length_in_each_slot:
         file.write(str(item) + " ")
@@ -292,9 +292,9 @@ def print_result():
     # to do
     # ave_execute_latency_in_each_slot_file_path = config.local_ave_execute_latency_in_each_slot_file_path
     # ave_execute_latency_in_each_slot_file_path = config.nearest_ave_execute_latency_in_each_slot_file_path
-    ave_execute_latency_in_each_slot_file_path = config.random_ave_execute_latency_in_each_slot_file_path
+    # ave_execute_latency_in_each_slot_file_path = config.random_ave_execute_latency_in_each_slot_file_path
     # ave_execute_latency_in_each_slot_file_path = config.match_ave_execute_latency_in_each_slot_file_path
-    # ave_execute_latency_in_each_slot_file_path = config.proposed_ave_execute_latency_in_each_slot_file_path
+    ave_execute_latency_in_each_slot_file_path = config.proposed_ave_execute_latency_in_each_slot_file_path
     file = open(ave_execute_latency_in_each_slot_file_path, 'w+')
     for item in ave_execute_latency_in_each_slot:
         file.write(str(item) + " ")
@@ -303,9 +303,9 @@ def print_result():
     # to do
     # energy_cost_in_each_slot_file_path = config.local_energy_cost_in_each_slot_file_path
     # energy_cost_in_each_slot_file_path = config.nearest_energy_cost_in_each_slot_file_path
-    energy_cost_in_each_slot_file_path = config.random_energy_cost_in_each_slot_file_path
+    # energy_cost_in_each_slot_file_path = config.random_energy_cost_in_each_slot_file_path
     # energy_cost_in_each_slot_file_path = config.match_energy_cost_in_each_slot_file_path
-    # energy_cost_in_each_slot_file_path = config.proposed_energy_cost_in_each_slot_file_path
+    energy_cost_in_each_slot_file_path = config.proposed_energy_cost_in_each_slot_file_path
     file = open(energy_cost_in_each_slot_file_path, 'w+')
     for item in energy_cost_in_each_slot:
         file.write(str(item) + " ")
@@ -314,9 +314,9 @@ def print_result():
     # to do
     # latency_cost_in_each_slot_file_path = config.local_latency_cost_in_each_slot_file_path
     # latency_cost_in_each_slot_file_path = config.nearest_latency_cost_in_each_slot_file_path
-    latency_cost_in_each_slot_file_path = config.random_latency_cost_in_each_slot_file_path
+    # latency_cost_in_each_slot_file_path = config.random_latency_cost_in_each_slot_file_path
     # latency_cost_in_each_slot_file_path = config.match_latency_cost_in_each_slot_file_path
-    # latency_cost_in_each_slot_file_path = config.proposed_latency_cost_in_each_slot_file_path
+    latency_cost_in_each_slot_file_path = config.proposed_latency_cost_in_each_slot_file_path
     file = open(latency_cost_in_each_slot_file_path, 'w+')
     for item in latency_cost_in_each_slot:
         file.write(str(item) + " ")
@@ -325,9 +325,9 @@ def print_result():
     # to do
     # error_cost_in_each_slot_file_path = config.local_error_cost_in_each_slot_file_path
     # error_cost_in_each_slot_file_path = config.nearest_error_cost_in_each_slot_file_path
-    error_cost_in_each_slot_file_path = config.random_error_cost_in_each_slot_file_path
+    # error_cost_in_each_slot_file_path = config.random_error_cost_in_each_slot_file_path
     # error_cost_in_each_slot_file_path = config.match_error_cost_in_each_slot_file_path
-    # error_cost_in_each_slot_file_path = config.proposed_error_cost_in_each_slot_file_path
+    error_cost_in_each_slot_file_path = config.proposed_error_cost_in_each_slot_file_path
     file = open(error_cost_in_each_slot_file_path, 'w+')
     for item in error_cost_in_each_slot:
         file.write(str(item) + " ")
@@ -336,9 +336,9 @@ def print_result():
     # to do
     # total_cost_in_each_slot_file_path = config.local_total_cost_in_each_slot_file_path
     # total_cost_in_each_slot_file_path = config.nearest_total_cost_in_each_slot_file_path
-    total_cost_in_each_slot_file_path = config.random_total_cost_in_each_slot_file_path
+    # total_cost_in_each_slot_file_path = config.random_total_cost_in_each_slot_file_path
     # total_cost_in_each_slot_file_path = config.match_total_cost_in_each_slot_file_path
-    # total_cost_in_each_slot_file_path = config.proposed_total_cost_in_each_slot_file_path
+    total_cost_in_each_slot_file_path = config.proposed_total_cost_in_each_slot_file_path
     file = open(total_cost_in_each_slot_file_path, 'w+')
     for item in total_cost_in_each_slot:
         file.write(str(item) + " ")
@@ -347,9 +347,9 @@ def print_result():
     # to do
     # io_in_each_slot_file_path = config.local_io_in_each_slot_file_path
     # io_in_each_slot_file_path = config.nearest_io_in_each_slot_file_path
-    io_in_each_slot_file_path = config.random_io_in_each_slot_file_path
+    # io_in_each_slot_file_path = config.random_io_in_each_slot_file_path
     # io_in_each_slot_file_path = config.match_io_in_each_slot_file_path
-    # io_in_each_slot_file_path = config.proposed_io_in_each_slot_file_path
+    io_in_each_slot_file_path = config.proposed_io_in_each_slot_file_path
     file = open(io_in_each_slot_file_path, 'w+')
     for item in io_in_each_slot:
         file.write(str(item) + " ")
